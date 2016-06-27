@@ -93,6 +93,7 @@ public class Map {
 					}
 					
 					corridors.add(new Room(corridorX, corridorY, 1, corridorHeight));
+					room.setHasCorridor(true);
 					
 				}
 				if (room.getY() == rooms.get(index).getY() && ( !room.equals(rooms.get(index)) ) ){
@@ -120,12 +121,13 @@ public class Map {
 					}
 					
 					corridors.add(new Room(corridorX, corridorY, corridorWidth, 1));
+					room.setHasCorridor(true);
 				}
 					
 			}
 		}
 		
-		
+		//for (Room)
 		
 		
 		
