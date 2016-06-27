@@ -8,7 +8,8 @@ public class Map {
 	private ArrayList<ArrayList<String>> grid;
 	private ArrayList<ArrayList<String>> gridRooms;
 	private Random random = new Random();
-	private ArrayList<Room> rooms = new ArrayList<Room>(); 
+	private ArrayList<Room> rooms = new ArrayList<Room>();
+	private ArrayList<Room> corridors;
 	
 	public Map(){}
 	public Map(Integer size){
@@ -62,72 +63,27 @@ public class Map {
 	}
 	
 	private void buildCorridors(){
-		ArrayList<Room> corridors = new ArrayList<Room>();
+		corridors = new ArrayList<Room>();
 		if (rooms.size() == 0){
 			System.out.println("Error: there are no rooms (printed from the stranded Rooms check)");
 		}
 		for (Room room: rooms){
 			for (int index = 0; index < rooms.size(); index ++){
 				if (room.getX() == rooms.get(index).getX() && ( !room.equals(rooms.get(index)) ) ){
-					//create a corridor and add it to corridors!
-					//get the max and min width of both rooms
-					int room1MinWidth = room.getX();
-					int room1MaxWidth = room.getX() + room.getWidth();
-					int room2MinWidth = rooms.get(index).getX();
-					int room2MaxWidth = rooms.get(index).getX() + rooms.get(index).getWidth();
-					
-					int minWidth = Math.max(room1MinWidth, room2MinWidth);
-					int maxWidth = Math.min(room1MaxWidth, room2MaxWidth);
-					
-					int corridorX = minWidth + random.nextInt((maxWidth - minWidth) + 1);
-					
-					Integer corridorY;
-					Integer corridorHeight;
-					if (room.getY() > rooms.get(index).getY()){
-						corridorY = rooms.get(index).getY() + rooms.get(index).getHeight();
-						corridorHeight = room.getY() - corridorY;
-					}else{
-						corridorY = room.getY() + room.getHeight();
-						corridorHeight = rooms.get(index).getY() - corridorY;
-						
-					}
-					
-					corridors.add(new Room(corridorX, corridorY, 1, corridorHeight));
-					room.setHasCorridor(true);
-					
+					buildVerticalCorridor(room, rooms.get(index));
 				}
 				if (room.getY() == rooms.get(index).getY() && ( !room.equals(rooms.get(index)) ) ){
-					//create a corridor and add it to corridors!
-					//get the max and min height of both rooms
-					int room1MinHeight = room.getY();
-					int room1MaxHeight = room.getY() + room.getHeight();
-					int room2MinHeight = rooms.get(index).getHeight();
-					int room2MaxHeight = rooms.get(index).getHeight() + rooms.get(index).getHeight();
-					
-					int minHeight = Math.max(room1MinHeight, room2MinHeight);
-					int maxHeight = Math.min(room1MaxHeight, room2MaxHeight);
-					
-					int corridorY = minHeight + random.nextInt((maxHeight - minHeight) + 1);
-					
-					Integer corridorX;
-					Integer corridorWidth;
-					if (room.getY() > rooms.get(index).getY()){
-						corridorX = rooms.get(index).getX() + rooms.get(index).getWidth();
-						corridorWidth = room.getX() - corridorX;
-					}else{
-						corridorX = room.getX() + room.getWidth();
-						corridorWidth = rooms.get(index).getX() - corridorX;
-						
-					}
-					
-					corridors.add(new Room(corridorX, corridorY, corridorWidth, 1));
-					room.setHasCorridor(true);
+					buildHorizontalCorridor(room, rooms.get(index));
 				}
 					
 			}
 		}
-		
-		//for (Room)
+		//do a quick check to see if there are rooms with no corridors
+		for (Room room: rooms){
+			if (!room.hasCorridor){
+				corridorlessRoomFix(room);
+			}
+		}
 		
 		
 		
@@ -151,10 +107,71 @@ public class Map {
 	public void setSize(Integer size){
 		this.size = size;
 	}
-	
 	public void setGrid(ArrayList<ArrayList<String>> grid){
 		this.grid = grid;
 	}
+	private void corridorlessRoomFix(Room lonelyRoom){
+		for (int index = 0; index < rooms.size(); index++){
+			
+		}
+	}
+	
+	private void buildHorizontalCorridor(Room room1, Room room2){
+		//create a corridor and add it to corridors!
+		//get the max and min height of both rooms
+		int room1MinHeight = room1.getY();
+		int room1MaxHeight = room1.getY() + room1.getHeight();
+		int room2MinHeight = room2.getHeight();
+		int room2MaxHeight = room2.getHeight() + room2.getHeight();
+		
+		int minHeight = Math.max(room1MinHeight, room2MinHeight);
+		int maxHeight = Math.min(room1MaxHeight, room2MaxHeight);
+		
+		int corridorY = minHeight + random.nextInt((maxHeight - minHeight) + 1);
+		
+		Integer corridorX;
+		Integer corridorWidth;
+		if (room1.getY() > room2.getY()){
+			corridorX = room2.getX() + room2.getWidth();
+			corridorWidth = room1.getX() - corridorX;
+		}else{
+			corridorX = room1.getX() + room1.getWidth();
+			corridorWidth = room2.getX() - corridorX;
+			
+		}
+		
+		corridors.add(new Room(corridorX, corridorY, corridorWidth, 1));
+		room1.setHasCorridor(true);
+	}
+	private void buildVerticalCorridor(Room room1, Room room2){
+		//create a corridor and add it to corridors!
+		//get the max and min width of both rooms
+		int room1MinWidth = room1.getX();
+		int room1MaxWidth = room1.getX() + room1.getWidth();
+		int room2MinWidth = room2.getX();
+		int room2MaxWidth = room2.getX() + room2.getWidth();
+		
+		int minWidth = Math.max(room1MinWidth, room2MinWidth);
+		int maxWidth = Math.min(room1MaxWidth, room2MaxWidth);
+		
+		int corridorX = minWidth + random.nextInt((maxWidth - minWidth) + 1);
+		
+		Integer corridorY;
+		Integer corridorHeight;
+		if (room1.getY() > room2.getY()){
+			corridorY = room2.getY() + room2.getHeight();
+			corridorHeight = room1.getY() - corridorY;
+		}else{
+			corridorY = room1.getY() + room1.getHeight();
+			corridorHeight = room2.getY() - corridorY;
+			
+		}
+		
+		corridors.add(new Room(corridorX, corridorY, 1, corridorHeight));
+		room1.setHasCorridor(true);
+	}
+	
+	
 }
 
 
